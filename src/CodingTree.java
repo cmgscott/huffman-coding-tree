@@ -1,6 +1,9 @@
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class CodingTree {
 
@@ -18,15 +21,21 @@ public class CodingTree {
 	
 	private double charWeight;
 	
-	private MyPriorityQueue<HuffmanNode> myPriorityQueue;
+	private PriorityQueue<HuffmanNode> myPriorityQueue;
+	
+	int[] binary = new int[128];
+	int current = 0;
 	
 	ArrayList<Nodes> priorityArray;
 
 	ArrayList<TreeNode> huffmanTree;
+
+	StringBuilder binaryCode = new StringBuilder();
 	
 	public CodingTree(String message) {
 		myMsgToCompress = message;
-		myPriorityQueue = new MyPriorityQueue();
+		myPriorityQueue = new PriorityQueue();
+		codes = new HashMap<Character, String>();
 
 		double charCount = FrequencyCalculator.findTotalSymbols(myMsgToCompress);
 		
@@ -36,9 +45,14 @@ public class CodingTree {
 			
 //			System.out.println(c + ": " + charWeight);
 		}
-		priorityArray = myPriorityQueue.toArray();
+//		priorityArray = myPriorityQueue.toArray();
 		huffmanTree = new ArrayList<TreeNode>();
-		mergeNodes((HuffmanNode) myPriorityQueue.peek());
+		mergeNodes();
+		
+		binaryCode = new StringBuilder();
+		generateBinary(myPriorityQueue.peek(), binaryCode);
+		
+		System.out.println(codes.get(']'));
 		
 		/**Testing Code**/
 //		double sum = 0;
@@ -53,20 +67,38 @@ public class CodingTree {
 //		FrequencyCalculator.printTotalSymbols();
 	}
 	
-	private void mergeNodes(HuffmanNode lowest) {
+	private void mergeNodes() {
 		while (myPriorityQueue.size() > 1) {
-					myPriorityQueue.peek()
-//					TreeNode innerNode = new TreeNode(lowest.getWeight() + priorityArray.get(i).getWeight());
-//					innerNode.setLeft(lowest);
-//					innerNode.setRight(priorityArray.get(i));
-//					myPriorityQueue.pop();
-//					priorityArray.remove(i);
-//					
-//					huffmanTree.add(innerNode);
-//					priorityArray.add(innerNode);
-//					mergeNodes((HuffmanNode) myPriorityQueue.peek());
+					HuffmanNode lowestNode = myPriorityQueue.poll();
+					HuffmanNode secLowestNode = myPriorityQueue.poll();
+					HuffmanNode newNode = new HuffmanNode(lowestNode.getWeight() + secLowestNode.getWeight());
+					newNode.setLeft(lowestNode);
+					newNode.setRight(secLowestNode);
+					myPriorityQueue.add(newNode);
+					mergeNodes();
 		}
-		System.out.println("i did it second try");
+	}
+	
+	private void generateBinary(HuffmanNode currentNode, StringBuilder theBinCode) {
+		if (currentNode.getLeft() == null) {
+			theBinCode.append('0');
+			currentNode.setBin(theBinCode);
+			codes.put(currentNode.getSymb(), theBinCode.toString());
+		} else if (currentNode.getLeft() != null) {
+			theBinCode.append('0');
+			currentNode.setBin(theBinCode);
+			generateBinary(currentNode.getLeft(), theBinCode);
+		}
+		if (currentNode.getRight() == null) {
+			theBinCode.append('1');
+			currentNode.setBin(theBinCode);
+			codes.put(currentNode.getSymb(), theBinCode.toString());
+		} else if (currentNode.getRight() != null) {
+			theBinCode.append('1');
+			currentNode.setBin(theBinCode);
+			generateBinary(currentNode.getRight(), theBinCode);
+		}
+		System.out.println(currentNode.getSymb() + ": " + currentNode.binToString());
 	}
 
 }

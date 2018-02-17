@@ -7,9 +7,9 @@ import java.util.ArrayList;
  *
  * @param <HuffmanNode>
  */
-public class MyPriorityQueue<Object> {
+public class MyPriorityQueue<T> {
 
-	private Object t;
+	private ArrayList<HuffmanNode> theChars = new ArrayList<HuffmanNode>();
 
 	private Object front, back;
 
