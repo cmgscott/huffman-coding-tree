@@ -4,10 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 public class CodingTree {
 
-	private static final char[] CHAR_ALPHA_SYMB = "0123456789/.,?><';\":=+-_)(*&^%$#@!~`][}{' 'ABCDEEFGHIJLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+	private static final char[] CHAR_ALPHA_SYMB = "0123456789/.,?><';\":=+-_)(*&^%$#@!~`][}{ ABCDEEFGHIJLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
 	
 	private String myMsgToCompress;
 	
@@ -21,20 +22,20 @@ public class CodingTree {
 	
 	private double charWeight;
 	
-	private PriorityQueue<HuffmanNode> myPriorityQueue;
+	private MyPriorityQueue<HuffmanNode> myPriorityQueue;
 	
 	int[] binary = new int[128];
 	int current = 0;
 	
-	ArrayList<Nodes> priorityArray;
+	ArrayList<HuffmanNode> priorityArray;
 
-	ArrayList<TreeNode> huffmanTree;
+	ArrayList<HuffmanNode> huffmanTree;
 
 	StringBuilder binaryCode = new StringBuilder();
 	
 	public CodingTree(String message) {
 		myMsgToCompress = message;
-		myPriorityQueue = new PriorityQueue();
+		myPriorityQueue = new MyPriorityQueue<HuffmanNode>();
 		codes = new HashMap<Character, String>();
 
 		double charCount = FrequencyCalculator.findTotalSymbols(myMsgToCompress);
@@ -45,60 +46,62 @@ public class CodingTree {
 			
 //			System.out.println(c + ": " + charWeight);
 		}
-//		priorityArray = myPriorityQueue.toArray();
-		huffmanTree = new ArrayList<TreeNode>();
+		huffmanTree = new ArrayList<HuffmanNode>();
 		mergeNodes();
 		
 		binaryCode = new StringBuilder();
-		generateBinary(myPriorityQueue.peek(), binaryCode);
+		generateBinary((HuffmanNode) myPriorityQueue.peek(), binaryCode);
 		
-		System.out.println(codes.get(']'));
-		
-		/**Testing Code**/
-//		double sum = 0;
-//		HuffmanNode currentNode = (HuffmanNode) myPriorityQueue.peek();
-//		for (int i = 0; i < priorityArray.size(); i++) {
-//			sum+= currentNode.getWeight();
-//			System.out.println((priorityArray.get(i)).getSymb() + ": " + priorityArray.get(i).getWeight());
-//			currentNode = currentNode.nextNode();
-//		}
-//		System.out.println("Array size: " + priorityArray.size());
-//		System.out.println("Sum is: " + sum);
-//		FrequencyCalculator.printTotalSymbols();
+		Set<Character> keySet = codes.keySet();
+		Object[] keySetArray = keySet.toArray();
+		for (int i = 0; i < keySet.size(); i++) {
+		System.out.println((Character) keySetArray[i]);
+		}
 	}
 	
 	private void mergeNodes() {
 		while (myPriorityQueue.size() > 1) {
-					HuffmanNode lowestNode = myPriorityQueue.poll();
-					HuffmanNode secLowestNode = myPriorityQueue.poll();
-					HuffmanNode newNode = new HuffmanNode(lowestNode.getWeight() + secLowestNode.getWeight());
+					HuffmanNode lowestNode = (HuffmanNode) myPriorityQueue.poll();
+					HuffmanNode secLowestNode = (HuffmanNode) myPriorityQueue.poll();
+					HuffmanNode newNode = new HuffmanNode('\t', lowestNode.getWeight() + secLowestNode.getWeight());
 					newNode.setLeft(lowestNode);
 					newNode.setRight(secLowestNode);
 					myPriorityQueue.add(newNode);
+//					System.out.println("| " + "left: " + lowestNode.getSymb() + " | right: " + secLowestNode.getSymb() + " |");
 					mergeNodes();
 		}
 	}
 	
 	private void generateBinary(HuffmanNode currentNode, StringBuilder theBinCode) {
-		if (currentNode.getLeft() == null) {
-			theBinCode.append('0');
-			currentNode.setBin(theBinCode);
-			codes.put(currentNode.getSymb(), theBinCode.toString());
-		} else if (currentNode.getLeft() != null) {
-			theBinCode.append('0');
-			currentNode.setBin(theBinCode);
-			generateBinary(currentNode.getLeft(), theBinCode);
-		}
 		if (currentNode.getRight() == null) {
 			theBinCode.append('1');
 			currentNode.setBin(theBinCode);
 			codes.put(currentNode.getSymb(), theBinCode.toString());
-		} else if (currentNode.getRight() != null) {
+			theBinCode.deleteCharAt(theBinCode.length()-1);
+		} 
+		if (currentNode.getRight() != null) {
 			theBinCode.append('1');
 			currentNode.setBin(theBinCode);
-			generateBinary(currentNode.getRight(), theBinCode);
+			generateBinary(currentNode.getRight(), currentNode.getBin());
 		}
-		System.out.println(currentNode.getSymb() + ": " + currentNode.binToString());
+		if (currentNode.getLeft() == null) {
+			theBinCode.append('0');
+			currentNode.setBin(theBinCode);
+			codes.put(currentNode.getSymb(), theBinCode.toString());
+			theBinCode.deleteCharAt(theBinCode.length()-1);
+		} 
+		if (currentNode.getLeft() != null) {
+			theBinCode.append('0');
+			currentNode.setBin(theBinCode);
+			generateBinary(currentNode.getLeft(), currentNode.getBin());
+		}
+//		System.out.println(currentNode.getSymb() + ": " + currentNode.binToString());
+	}
+	
+	private void removeBlankNodes() {
+		Set<Character> keySet = codes.keySet();
+		for (int i = 0; i < keySet.size(); i++) {
+		}
 	}
 
 }

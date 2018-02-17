@@ -8,18 +8,19 @@ import java.util.ArrayList;
  * @param <HuffmanNode>
  */
 public class MyPriorityQueue<T> {
+	
+	private final static int FRONT_INDEX = 0;
+	
+	private int backIndex;
 
-	private ArrayList<HuffmanNode> theChars = new ArrayList<HuffmanNode>();
-
-	private Object front, back;
+	private ArrayList<HuffmanNode> theChars = new ArrayList<HuffmanNode>(128);
 
 	private int myCurrentSize;
 	
 	private int index;
 
 	public MyPriorityQueue() {
-		front = back = null;
-		index = -1;
+		backIndex = -1;
 	}
 
 	//	public boolean add(Object node) {
@@ -31,114 +32,109 @@ public class MyPriorityQueue<T> {
 	//		}
 	//	}
 
-	public boolean add(Object theNode) {
+	public boolean add(T theNode) {
 		boolean returnBool = false;
-		HuffmanNode currentNode = (HuffmanNode) front;
-		HuffmanNode previousNode = (HuffmanNode) back;
-		int count = 0;
-		if (front == null) {
-			front = back = /*(Object)(Object)*/theNode;
-			myCurrentSize++;
-			index++;
-			return true;
-		} else if (((HuffmanNode) theNode).getFrequency() < ((HuffmanNode) front).getFrequency()) {
-			((HuffmanNode) theNode).setNextNode((HuffmanNode) front);
-			front = theNode;
-			myCurrentSize++;
-			index++;
+//		HuffmanNode currentNode = (HuffmanNode) front;
+//		HuffmanNode previousNode = (HuffmanNode) back;
+
+//		for (int i = 0; i < theChars.size(); i++) {
+//		System.out.print(theChars.get(i).getSymb() + ", ");
+//		}
+//		System.out.println();
+//		System.out.println();
+		if (theChars.isEmpty()) {
+			backIndex = 0;
+			theChars.add((HuffmanNode) theNode);
 			return true;
 		} else {
-			while (!returnBool) {
-				if (((HuffmanNode) theNode).getFrequency() < currentNode.getFrequency()) {
-					((HuffmanNode) theNode).setNextNode(previousNode.nextNode());
-					previousNode.setNextNode((HuffmanNode) theNode);
-					myCurrentSize++;
-					index++;
+			for (int i = 0; i < theChars.size(); i++) {
+				if (((HuffmanNode) theNode).getWeight() <= theChars.get(i).getWeight()) {
+					theChars.add(i, (HuffmanNode) theNode);
+					backIndex++;
 					return true;
-				} else if (((HuffmanNode) theNode).getFrequency() >= currentNode.getFrequency()) {
-					// if at end, add after current node, return true
-					if (currentNode.nextNode() == null) {
-						currentNode.setNextNode((HuffmanNode) theNode);
-						myCurrentSize++;
-						index++;
-						back = theNode;
-						return true;
-					} else {
-						// move on
-						previousNode = currentNode;
-						currentNode = currentNode.nextNode();
-						count++;
-					}
-				} 
+				} else if (i +1 == theChars.size()) {
+					theChars.add(i+1, (HuffmanNode) theNode);
+					return true;
+					
+				}
 			}
+//			while (!returnBool) {
+//				if (((HuffmanNode) theNode).getFrequency() < currentNode.getFrequency()) {
+//					((HuffmanNode) theNode).setNextNode(previousNode.nextNode());
+//					previousNode.setNextNode((HuffmanNode) theNode);
+//					myCurrentSize++;
+//					index++;
+//					return true;
+//				} else if (((HuffmanNode) theNode).getFrequency() >= currentNode.getFrequency()) {
+//					// if at end, add after current node, return true
+//					if (currentNode.nextNode() == null) {
+//						currentNode.setNextNode((HuffmanNode) theNode);
+//						myCurrentSize++;
+//						index++;
+//						back = theNode;
+//						return true;
+//					} else {
+//						// move on
+//						previousNode = currentNode;
+//						currentNode = currentNode.nextNode();
+//					}
+//				} 
+//			}
 		}
+		
 		return returnBool;
 	}
 
 	public void remove(Object theNode) {
-		HuffmanNode currentNode = (HuffmanNode) front;
-		HuffmanNode previousNode = currentNode;
+//		HuffmanNode currentNode = (HuffmanNode) front;
+//		HuffmanNode previousNode = currentNode;
 		HuffmanNode nodeToRemove = (HuffmanNode) theNode;
-		while (currentNode != nodeToRemove && currentNode != null) {
-			previousNode = currentNode;
-			currentNode = currentNode.nextNode();
-		}
-		if (currentNode == null) {
-			System.out.println("Character not found");
-		}
-		if (currentNode == nodeToRemove) {
-			if (currentNode == (HuffmanNode) front) {
-				front = (Object) currentNode.nextNode();
-				myCurrentSize--;
-				index--;
-			} else {
-				previousNode.setNextNode(currentNode.nextNode());
-				myCurrentSize--;
-				index--;
-			}
-		}
+		theChars.remove(nodeToRemove);
+//		while (currentNode != nodeToRemove && currentNode != null) {
+//			previousNode = currentNode;
+//			currentNode = currentNode.nextNode();
+//		}
+//		if (currentNode == null) {
+//			System.out.println("Character not found");
+//		}
+//		if (currentNode == nodeToRemove) {
+//			if (currentNode == (HuffmanNode) front) {
+//				front = (Object) currentNode.nextNode();
+//				myCurrentSize--;
+//				index--;
+//			} else {
+//				previousNode.setNextNode(currentNode.nextNode());
+//				myCurrentSize--;
+//				index--;
+//			}
+//		}
 
 	}
 
 	public int size() {
-		return myCurrentSize;
+		return theChars.size();
 	}
 
 	public Object peek() {
-		return front;
+		return theChars.get(0);
 	}
 
 	public ArrayList toArray() {
-		HuffmanNode currentNode = (HuffmanNode) front;
-		ArrayList returnArr = new ArrayList();
-		for (int i = 0; i < myCurrentSize; i++) {
-			returnArr.add(currentNode);
-			currentNode = currentNode.nextNode();
-		}
-		return returnArr;
+		return theChars;
 	}
 
 	public Object getBack() {
-		return back;
+		return theChars.get(backIndex);
 	}
 
-	public Object pop() {
-		Object temp = front;
-		front = (Object) ((HuffmanNode) front).nextNode();
-		myCurrentSize--;
+	public Object poll() {
+		Object temp = theChars.get(0);
+		theChars.remove(0);
+		backIndex--;
 		return temp;
 	}
 	
 	public Object get(int theIndex) {
-		if (theIndex > myCurrentSize) {
-		HuffmanNode currentNode = (HuffmanNode) front;
-		for (int i = 0; i <= theIndex; i++) {
-			currentNode = currentNode.nextNode();
-		}
-		return (Object) currentNode;
-		} else {
-			//throw exception
-			return null;
-		}
+		return theChars.get(theIndex);
 	}
 }

@@ -24,7 +24,8 @@ public class HuffmanNode extends Nodes implements Comparator<HuffmanNode>, Compa
 	}
 	
 	// construct inner nodes
-	public HuffmanNode(double theWeight) {
+	public HuffmanNode(char theSymbol, double theWeight) {
+		symbol = theSymbol;
 		weight = theWeight;
 		binaryCode = new StringBuilder();
 	}
