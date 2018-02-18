@@ -1,92 +1,133 @@
-import java.util.Comparator;
+// Christin Scott
 
-public class HuffmanNode extends Nodes implements Comparator<HuffmanNode>, Comparable<HuffmanNode> {
-	
+/**
+ * 
+ * @author Christin Scott
+ *
+ */
+public class HuffmanNode {
+	/** the character. inner nodes of huffman tree have a tab for the symbol. **/
 	private char symbol;
-	
+
+	/** the weight, or ratio of character occurrences to total character count. **/
 	private double weight;
-	
-	private HuffmanNode next;
-	
+
+	/** the total amount of times the character occurs in the text. **/
 	private int frequency;
-	
+
+	/** the left node for the huffman tree. **/
 	private HuffmanNode left;
-	
+
+	/** the right node for the huffman tree. **/
 	private HuffmanNode right;
-	
+
+	/** the binary code for the character. **/
 	private StringBuilder binaryCode;
 	
+	/**
+	 * The overloaded three parameter constructor for a HuffmanNode. Calls the two parameter constructor, and assigns a 
+	 * value to the frequency. Used to create the nodes for the PriorityQueue.
+	 * @param theSymbol the character
+	 * @param theWeight the frequency ratio
+	 * @param theFreq the total count of characters in text
+	 */
 	public HuffmanNode(char theSymbol, double theWeight, int theFreq) {
-		symbol = theSymbol;
-		weight = theWeight;
+		this(theSymbol, theWeight);
 		frequency = theFreq;
-		binaryCode = new StringBuilder();
 	}
 	
-	// construct inner nodes
+	/**
+	 * The overloaded two parameter constructor for a HuffmanNode. Used to create merged nodes with no frequency value.
+	 * Frequency left null to help differentiate between the two nodes in lieu of two class inheriting from a super
+	 * class.
+	 * @param theSymbol the character (should be '\t' for easy identification)
+	 * @param theWeight the frequency ratio
+	 */
 	public HuffmanNode(char theSymbol, double theWeight) {
 		symbol = theSymbol;
 		weight = theWeight;
 		binaryCode = new StringBuilder();
 	}
 
-	@Override
-	public int compare(HuffmanNode arg0, HuffmanNode arg1) {
-		return arg1.getFrequency() - arg0.getFrequency();
-	}
-
+	/**
+	 * 
+	 * @return
+	 */
 	public double getWeight() {
 		return weight;
 	}
 	
-	public HuffmanNode nextNode() {
-		return next;
-	}
-	
-	public void setNextNode(HuffmanNode theNode) {
-		this.next = theNode;
-	}
-	
+	/**
+	 * 
+	 * @return
+	 */
 	public char getSymb() {
 		return symbol;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public int getFrequency() {
 		return frequency;
 	}
 	
+	/**
+	 * 
+	 * @param leftNode
+	 */
 	public void setLeft(HuffmanNode leftNode) {
 		this.left = leftNode;
 	}
 	
+	/**
+	 * 
+	 * @param rightNode
+	 */
 	public void setRight(HuffmanNode rightNode) {
 		this.right = rightNode;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public HuffmanNode getLeft() {
 		return this.left;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public HuffmanNode getRight() {
 		return this.right;
 	}
 	
+	/**
+	 * 
+	 * @param binary
+	 */
 	public void setBin(StringBuilder binary) {
 		binaryCode = new StringBuilder();
 		binaryCode.append(binary);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public StringBuilder getBin() {
 		return binaryCode;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String binToString() {
 		return binaryCode.toString();
-	}
-
-	@Override
-	public int compareTo(HuffmanNode arg0) {
-		return ((Integer) this.frequency).compareTo((Integer) arg0.frequency);
 	}
 
 }
