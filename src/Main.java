@@ -1,15 +1,28 @@
+// Christin Scott
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 
+/**
+ * 
+ * @author CMGS
+ *
+ */
 public class Main {
-	
+
+	/**  **/
 	private final static StringBuilder myText = new StringBuilder();
-	
+
+	/**  **/
 	private static CodingTree myCodingTree;
 
+	/**
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		// read in from a text file
 		// output two files (codes text file and compressed binary file
@@ -18,13 +31,12 @@ public class Main {
 		FileReader inputStream = null;
 
 		try {
-			inputStream = new FileReader("src\\test1");
+			inputStream = new FileReader("src\\test2");
 			BufferedReader bufferedStream = new BufferedReader(inputStream);
 			String line;
-			int count = 0;
 			while ((line = bufferedStream.readLine()) != null) {
 				myText.append(line);
-				myText.append(" ");
+//				myText.append(" ");
 			}
 			myCodingTree = new CodingTree(myText.toString());
 			bufferedStream.close();
