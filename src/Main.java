@@ -31,7 +31,7 @@ public class Main {
 		FileReader inputStream = null;
 
 		try {
-			inputStream = new FileReader("src\\test2");
+			inputStream = new FileReader("src\\test1");
 			BufferedReader bufferedStream = new BufferedReader(inputStream);
 			String line;
 			while ((line = bufferedStream.readLine()) != null) {

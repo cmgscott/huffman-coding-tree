@@ -111,27 +111,25 @@ public class CodingTree {
 	 * @param theBinCode
 	 */
 	private void generateBinary(HuffmanNode currentNode, StringBuilder theBinCode) {
-		if (currentNode.getRight() == null) {
-			theBinCode.append('1');
-			currentNode.setBin(theBinCode);
-			codes.put(currentNode.getSymb(), theBinCode.toString());
-			theBinCode.deleteCharAt(theBinCode.length()-1);
-		} 
-		if (currentNode.getRight() != null) {
-			theBinCode.append('1');
-			currentNode.setBin(theBinCode);
-			generateBinary(currentNode.getRight(), currentNode.getBin());
-		}
 		if (currentNode.getLeft() == null) {
 			theBinCode.append('0');
 			currentNode.setBin(theBinCode);
 			codes.put(currentNode.getSymb(), theBinCode.toString());
 			theBinCode.deleteCharAt(theBinCode.length()-1);
-		} 
-		if (currentNode.getLeft() != null) {
+		} else if (currentNode.getLeft() != null) {
 			theBinCode.append('0');
 			currentNode.setBin(theBinCode);
 			generateBinary(currentNode.getLeft(), currentNode.getBin());
+		}
+		if (currentNode.getRight() == null) {
+			theBinCode.append('1');
+			currentNode.setBin(theBinCode);
+			codes.put(currentNode.getSymb(), theBinCode.toString());
+			theBinCode.deleteCharAt(theBinCode.length()-1);
+		} else if (currentNode.getRight() != null) {
+			theBinCode.append('1');
+			currentNode.setBin(theBinCode);
+			generateBinary(currentNode.getRight(), currentNode.getBin());
 		}
 	}
 
