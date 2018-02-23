@@ -1,7 +1,7 @@
 // Christin Scott
 
 /**
- * 
+ * The HuffmanNode class creates the nodes for the Huffman Tree.
  * @author Christin Scott
  *
  */
@@ -50,81 +50,82 @@ public class HuffmanNode {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * This method gets the weight of the node.
+	 * @return the weight
 	 */
 	public double getWeight() {
 		return weight;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * This method gets the symbol of the node.
+	 * @return the symbol
 	 */
 	public char getSymb() {
 		return symbol;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * This method gets the frequency of the node.
+	 * @return the frequency
 	 */
 	public int getFrequency() {
 		return frequency;
 	}
 	
 	/**
-	 * 
-	 * @param leftNode
+	 * This method sets the left child of the node in the Huffman Tree.
+	 * @param leftNode the node to set as left child
 	 */
 	public void setLeft(HuffmanNode leftNode) {
 		this.left = leftNode;
 	}
 	
 	/**
-	 * 
-	 * @param rightNode
+	 * This method sets the right child of the node in the Huffman Tree.
+	 * @param rightNode the node to set as right child
 	 */
 	public void setRight(HuffmanNode rightNode) {
 		this.right = rightNode;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * This method gets the left child of the node.
+	 * @return the left child of the node
 	 */
 	public HuffmanNode getLeft() {
 		return this.left;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * This method gets the right child of the node.
+	 * @return the right child of the node
 	 */
 	public HuffmanNode getRight() {
 		return this.right;
 	}
 	
 	/**
-	 * 
-	 * @param binary
+	 * This method sets the binary code of the character based on the position in the Huffman Tree.
+	 * @param binary the binary code generated
 	 */
-	public void setBin(StringBuilder binary) {
+	public StringBuilder setBin(StringBuilder binary) {
 		binaryCode = new StringBuilder();
 		binaryCode.append(binary);
+		return binaryCode;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * This method gets the nodes binary code.
+	 * @return the binary code
 	 */
 	public StringBuilder getBin() {
 		return binaryCode;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * This method gets the string representation of the binary code.
+	 * @return the binary code
 	 */
 	public String binToString() {
 		return binaryCode.toString();

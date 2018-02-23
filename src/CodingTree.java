@@ -1,73 +1,39 @@
 // Christin Scott
 
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
 
 /**
- * 
- * @author CMGS
+ * The CodingTree class as required by the assignment. Handles the initial creation of priority queue, building the
+ * Huffman Tree, generating the binary for each character, and writing the newly encoded text to a new file.
+ * @author Christin Scott
  *
  */
 public class CodingTree {
 
-	/**  **/
-	private static final char[] CHAR_ALPHA_SYMB = "0123456789/.,?><';\":=+-_)(*&^%$#@!~`][}{ ABCDEEFGHIJLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
-
-	/**  **/
+	/** the text to compress **/
 	private String myMsgToCompress;
 
-	/**  **/
+	/** the map of generated binary codes for each character **/
 	public Map<Character, String> codes;
 
-	/**  **/
-	private ArrayList<HuffmanNode> openNodes;
-
-	/**  **/
+	/** the bitstring of encoded text **/
 	public StringBuilder bits;
 
-	/**  **/
-	public StringBuilder bits3;
+	/** the encodedMsg cast to characters **/
+	private List<Character>encodedMsg;
 
-	/**  **/
-	List<Byte> encodedMsg;
-
-	/**  **/
-	FrequencyCalculator myFrequencyCalculator = new FrequencyCalculator();
-
-	/**  **/
-	private double charWeight;
-
-	/**  **/
+	/** the priority queue for the Huffman Tree **/
 	private MyPriorityQueue<HuffmanNode> myPriorityQueue;
 
-	/**  **/
-	int[] binary = new int[128];
-
-	/**  **/
-	int current = 0;
-
-	/**  **/
-	ArrayList<HuffmanNode> priorityArray;
-
-	/**  **/
-	ArrayList<HuffmanNode> huffmanTree;
-
-	/**  **/
-	StringBuilder binaryCode = new StringBuilder();
-
 	/**
-	 * 
-	 * @param message
+	 * The constructor for the class. Constructor accepts the orignial text as a string, and the original file size.
+	 * The constructor also handles calculating the total number of characters in the original message and builds the
+	 * initial priority queue. It also calls the methods that complete the Huffman encoding.
+	 * @param message the original message
+	 * @param theOrgFileSize the original file size in bytes.
 	 */
 	public CodingTree(String message) {
 		myMsgToCompress = message;
@@ -76,24 +42,28 @@ public class CodingTree {
 
 		double charCount = FrequencyCalculator.findTotalSymbols(myMsgToCompress);
 
+		/** array of all characters to encode **/
+		final char[] CHAR_ALPHA_SYMB = ("0123456789/.,?><';\":=+-_)(*&^%$#@!~`][}{ ABCDEEFGHIJLMNOPQRSTUVWXYZabcdefghij"
+				+ "klmnopqrstuvwxyz\t\r").toCharArray();
+
 		for (char c : CHAR_ALPHA_SYMB) {
 			int charFrequency = FrequencyCalculator.calculateFreq(c, myMsgToCompress); // calc freq of each character
 			myPriorityQueue.add(new HuffmanNode(c, charFrequency / charCount, charFrequency));
 		}
-		huffmanTree = new ArrayList<HuffmanNode>();
-		mergeNodes();
 
-		binaryCode = new StringBuilder();
+		buildHuffmanTree();
+
+		/** the binary code generated **/
+		StringBuilder binaryCode = new StringBuilder();
 		generateBinary((HuffmanNode) myPriorityQueue.peek(), binaryCode);
 
 		writeToString();
-		writeToFile();
 	}
 
 	/**
-	 * 
+	 * Recursive method that builds the Huffman Tree starting with the highest priority nodes in the priority queue.
 	 */
-	private void mergeNodes() {
+	private void buildHuffmanTree() {
 		while (myPriorityQueue.size() > 1) {
 			HuffmanNode lowestNode = (HuffmanNode) myPriorityQueue.poll();
 			HuffmanNode secLowestNode = (HuffmanNode) myPriorityQueue.poll();
@@ -101,198 +71,58 @@ public class CodingTree {
 			newNode.setLeft(lowestNode);
 			newNode.setRight(secLowestNode);
 			myPriorityQueue.add(newNode);
-			mergeNodes();
+			buildHuffmanTree();
 		}
 	}
 
 	/**
-	 * 
-	 * @param currentNode
-	 * @param theBinCode
+	 * Recursive method that generates a binary encoding for each character from the Huffman Tree.
+	 * @param currentNode the current node in the tree
+	 * @param theBinCode the currently generated binary
 	 */
 	private void generateBinary(HuffmanNode currentNode, StringBuilder theBinCode) {
-		if (currentNode.getLeft() == null) {
-			theBinCode.append('0');
+		if (currentNode.getRight() == null && currentNode.getLeft() == null) {
 			currentNode.setBin(theBinCode);
-			codes.put(currentNode.getSymb(), theBinCode.toString());
+			codes.put(currentNode.getSymb(), currentNode.binToString());
 			theBinCode.deleteCharAt(theBinCode.length()-1);
-		} else if (currentNode.getLeft() != null) {
-			theBinCode.append('0');
-			currentNode.setBin(theBinCode);
-			generateBinary(currentNode.getLeft(), currentNode.getBin());
-		}
-		if (currentNode.getRight() == null) {
-			theBinCode.append('1');
-			currentNode.setBin(theBinCode);
-			codes.put(currentNode.getSymb(), theBinCode.toString());
-			theBinCode.deleteCharAt(theBinCode.length()-1);
-		} else if (currentNode.getRight() != null) {
-			theBinCode.append('1');
-			currentNode.setBin(theBinCode);
-			generateBinary(currentNode.getRight(), currentNode.getBin());
+		} else {
+			if (currentNode.getRight() != null) {
+				currentNode.setBin(theBinCode);
+				generateBinary(currentNode.getRight(), currentNode.setBin(currentNode.getBin().append('1')));
+			}
+			if (currentNode.getLeft() != null) {
+				currentNode.setBin(theBinCode);
+				generateBinary(currentNode.getLeft(), currentNode.setBin(currentNode.getBin().append('0')));
+			}
 		}
 	}
 
 	/**
-	 * 
+	 * Method that populates an array with the encoded message.
 	 */
 	private void writeToString() {
 		bits = new StringBuilder();
-		bits3 = new StringBuilder();
-		List<StringBuilder> bits4 = new ArrayList<StringBuilder>();
-		byte[] getBits = null;
-		encodedMsg = new ArrayList<Byte>();
-
-		Set<Character> keySet = codes.keySet();
-		Object[] keySetArray = keySet.toArray();
-		for (int i = 0; i < keySetArray.length; i++) {
-			if (codes.get(keySetArray[i]).length() <= 7) {
-				for (int j = 0; j < codes.get(keySetArray[i]).length(); j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				codes.put((Character) keySetArray[i], bits.toString());
-				bits = new StringBuilder();
-			} else if (codes.get(keySetArray[i]).length() <= 14) {
-				for (int j = 0; j < 7; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 7; j < codes.get(keySetArray[i]).length(); j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				codes.put((Character) keySetArray[i], bits.toString());
-				bits = new StringBuilder();
-			} else if (codes.get(keySetArray[i]).length() <= 21) {
-				for (int j = 0; j < 7; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 7; j < 14; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 14; j < codes.get(keySetArray[i]).length(); j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				codes.put((Character) keySetArray[i], bits.toString());
-				bits = new StringBuilder();
-			} else if (codes.get(keySetArray[i]).length() <= 28) {
-				for (int j = 0; j < 7; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 7; j < 14; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 14; j < 21; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 21; j < codes.get(keySetArray[i]).length(); j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				codes.put((Character) keySetArray[i], bits.toString());
-				bits = new StringBuilder();
-			} else if (codes.get(keySetArray[i]).length() <= 35) {
-				for (int j = 0; j < 7; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 7; j < 14; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 14; j < 21; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 21; j < 28; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 28; j < codes.get(keySetArray[i]).length(); j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				codes.put((Character) keySetArray[i], bits.toString());
-				bits = new StringBuilder();
-			} else if (codes.get(keySetArray[i]).length() <= 42) {
-				for (int j = 0; j < 7; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 7; j < 14; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 14; j < 21; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 21; j < 28; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 28; j < 35; j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				bits.append(" ");
-				for (int j = 35; j < codes.get(keySetArray[i]).length(); j++) {
-					bits.append(codes.get(keySetArray[i]).charAt(j));
-				}
-				codes.put((Character) keySetArray[i], bits.toString());
-				bits = new StringBuilder();
-			} 
-		}
-
-		/**
-		 * 
-		 */
-		StringBuilder theBytes = new StringBuilder();
-		for (int i = 0; i < myMsgToCompress.length(); i++) { // i goes through each character in text
-			if (codes.get(myMsgToCompress.charAt(i)) != null) { // if the char isn't null, which happened sometimes
-
-				if (codes.get(myMsgToCompress.charAt(i)).contains(" ")) { // then code needs multiple bytes, so
-					for (int j = 0; j < codes.get(myMsgToCompress.charAt(i)).length(); j++) { // for each char in binary string
-//						System.out.println(codes.get(myMsgToCompress.charAt(i)));
-						if (codes.get(myMsgToCompress.charAt(i)).charAt(j) != ' ') { // if the char in the binary string isn't space
-							// add the char to the stringBuilder
-							theBytes.append(codes.get(myMsgToCompress.charAt(i)).charAt(j));
-						} else if (codes.get(myMsgToCompress.charAt(i)).charAt(j) == ' ') { // if the char is a space it is a more to come string, and you need to
-							// add the current theBytes to make a new Byte and reset the string
-							encodedMsg.add(new Byte(Byte.parseByte(theBytes.toString(), 2)));
-							theBytes = new StringBuilder();
-						}
-					}
-					theBytes = new StringBuilder();
-				} else {
-					encodedMsg.add(new Byte(Byte.parseByte(codes.get(myMsgToCompress.charAt(i)), 2)));
-				}
+		encodedMsg = new ArrayList<Character>();
+		for (int i = 0; i < myMsgToCompress.length(); i++) {
+			if (codes.get(myMsgToCompress.charAt(i)) != null) {
+				bits.append(codes.get(myMsgToCompress.charAt(i)));
 			}
 		}
-	}
 
-	/**
-	 * 
-	 */
-	private void writeToFile() {
-		FileOutputStream outFile = null;
-//		BufferedWriter outFile2 = null;
-
-		try {
-//			outFile2 = new BufferedWriter(new FileWriter("compressed.txt"));
-			
-			outFile = new FileOutputStream("compressed");
-			for (int i = 0; i < encodedMsg.size(); i++) {
-				outFile.write(encodedMsg.get(i));
-//				outFile2.write(encodedMsg.get(i).toString());
-			}
-			outFile.write("hello".getBytes());
-//			outFile2.close();
-			outFile.close();
-		} catch (IOException e) {
-
+		for (int i = 0; i < bits.length() / 8 * 8; i+=8) {
+			char tempChar = (char) Byte.parseByte(bits.subSequence(i, i + 7).toString(), 2);
+			encodedMsg.add(tempChar);
+		}
+		if (bits.length() % 8 != 0) {
+			encodedMsg.add((char) Integer.parseInt(bits.subSequence(bits.length() / 8 * 8, bits.length()).toString()));
 		}
 	}
-
+	
+	public Map<Character, String> getCodes() {
+		return codes;
+	}
+	
+	public List<Character> getEncodedMsg() {
+		return encodedMsg;
+	}
 }
