@@ -14,7 +14,7 @@ import java.util.Set;
 
 /**
  * The main class.
- * @author Christin Scott
+ * @author cmgscott
  *
  */
 public class Main {
